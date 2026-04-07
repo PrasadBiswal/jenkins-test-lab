@@ -4,32 +4,24 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'Pulling code from GitHub...'
+                echo 'Pulling latest code from GitHub...'
                 checkout scm
             }
         }
 
-        stage('Environment Check') {
+        stage('Docker Build') {
             steps {
-                echo 'Checking System Info...'
-                sh 'whoami'
-                sh 'curl --version'
+                echo 'Building the .NET Container Image...'
+                // This command looks for the "Dockerfile" in your folder
+                sh 'docker build -t enterprise-app:v1 .'
             }
         }
 
-        stage('Docker Validation') {
+        stage('Verify & Clean') {
             steps {
-                echo 'Verifying Docker Engine is running...'
-                sh 'docker --version'
-                sh 'docker ps'
-            }
-        }
-        
-        stage('Build Simulation') {
-            steps {
-                echo 'Preparing to build .NET Application Image...'
-                // This is where we will eventually put "docker build"
-                sh 'echo "Ready for next step: Dockerfile creation"'
+                echo 'Verifying the new image exists...'
+                sh 'docker images | grep enterprise-app'
+                echo 'Success! Image is ready for deployment.'
             }
         }
     }
